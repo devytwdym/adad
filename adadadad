@@ -1,4 +1,4 @@
-
+--// CUSTOM DRAWING
 
 local drawing = {} do
     local services = setmetatable({}, {
@@ -2841,7 +2841,7 @@ function library:Load(options)
         Parent = holder,
     })
 
-local main = utility.create("Square", {
+ local main = utility.create("Square", {
     Size = UDim2.new(1, 0, 0, sizeY),
     Filled = true,
     Thickness = 0,
@@ -2850,26 +2850,25 @@ local main = utility.create("Square", {
     Theme = "Window Background"
 })
 
--- Add glow behind main (before outline/border!)
-addGlow(holder, sizeX, sizeY, Color3.fromRGB(0,255,255), 7)
+    main.MouseEnter:Connect(function()
+        services.ContextActionService:BindActionAtPriority("disablemousescroll", function() 
+            return Enum.ContextActionResult.Sink 
+        end, false, 3000, Enum.UserInputType.MouseWheel)
+    end)
 
-main.MouseEnter:Connect(function()
-    services.ContextActionService:BindActionAtPriority("disablemousescroll", function() 
-        return Enum.ContextActionResult.Sink 
-    end, false, 3000, Enum.UserInputType.MouseWheel)
-end)
+    main.MouseLeave:Connect(function()
+        services.ContextActionService:UnbindAction("disablemousescroll")
+    end)
 
-main.MouseLeave:Connect(function()
-    services.ContextActionService:UnbindAction("disablemousescroll")
-end)
+    local outline = utility.outline(main, "Accent")
 
-local outline = utility.outline(main, "Accent")
-local border = utility.outline(outline, "Window Border")
+    local border = utility.outline(outline, "Window Border")
 
+-- Rainbow stroke around main frame
 spawn(function()
     while true do
         local t = tick()
-        local color = Color3.fromHSV((t % 5) / 5, 1, 1)
+        local color = Color3.fromHSV((t % 5) / 5, 1, 1) -- cycles hue
         outline.Color = color
         border.Color = color
         wait(0.02)
