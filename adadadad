@@ -2841,7 +2841,7 @@ function library:Load(options)
         Parent = holder,
     })
 
- local main = utility.create("Square", {
+local main = utility.create("Square", {
     Size = UDim2.new(1, 0, 0, sizeY),
     Filled = true,
     Thickness = 0,
@@ -2850,25 +2850,43 @@ function library:Load(options)
     Theme = "Window Background"
 })
 
-    main.MouseEnter:Connect(function()
-        services.ContextActionService:BindActionAtPriority("disablemousescroll", function() 
-            return Enum.ContextActionResult.Sink 
-        end, false, 3000, Enum.UserInputType.MouseWheel)
-    end)
+-- Add glow INSIDE the main frame
+local function applyGlow(target, color, spread, baseTransparency)
+    baseTransparency = baseTransparency or 0.85
+    for i = 1, spread do
+        local glow = utility.create("Square", {
+            Parent = target,
+            Filled = true,
+            Thickness = 0,
+            Size = UDim2.new(1, i * 8, 1, i * 8),
+            Position = UDim2.new(0, -i * 4, 0, -i * 4),
+            Color = color,
+            ZIndex = target.ZIndex - 1,
+            Transparency = baseTransparency + i * 0.01
+        })
+    end
+end
 
-    main.MouseLeave:Connect(function()
-        services.ContextActionService:UnbindAction("disablemousescroll")
-    end)
+applyGlow(main, Color3.fromRGB(0,255,255), 6, 0.87)
 
-    local outline = utility.outline(main, "Accent")
+main.MouseEnter:Connect(function()
+    services.ContextActionService:BindActionAtPriority("disablemousescroll", function() 
+        return Enum.ContextActionResult.Sink 
+    end, false, 3000, Enum.UserInputType.MouseWheel)
+end)
 
-    local border = utility.outline(outline, "Window Border")
+main.MouseLeave:Connect(function()
+    services.ContextActionService:UnbindAction("disablemousescroll")
+end)
+
+local outline = utility.outline(main, "Accent")
+local border = utility.outline(outline, "Window Border")
 
 -- Rainbow stroke around main frame
 spawn(function()
     while true do
         local t = tick()
-        local color = Color3.fromHSV((t % 5) / 5, 1, 1) -- cycles hue
+        local color = Color3.fromHSV((t % 5) / 5, 1, 1)
         outline.Color = color
         border.Color = color
         wait(0.02)
