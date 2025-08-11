@@ -1,4 +1,4 @@
---// CUSTOM DRAWING
+
 
 local drawing = {} do
     local services = setmetatable({}, {
@@ -2850,24 +2850,8 @@ local main = utility.create("Square", {
     Theme = "Window Background"
 })
 
--- Add glow INSIDE the main frame
-local function applyGlow(target, color, spread, baseTransparency)
-    baseTransparency = baseTransparency or 0.85
-    for i = 1, spread do
-        local glow = utility.create("Square", {
-            Parent = target,
-            Filled = true,
-            Thickness = 0,
-            Size = UDim2.new(1, i * 8, 1, i * 8),
-            Position = UDim2.new(0, -i * 4, 0, -i * 4),
-            Color = color,
-            ZIndex = target.ZIndex - 1,
-            Transparency = baseTransparency + i * 0.01
-        })
-    end
-end
-
-applyGlow(main, Color3.fromRGB(0,255,255), 6, 0.87)
+-- Add glow behind main (before outline/border!)
+addGlow(holder, sizeX, sizeY, Color3.fromRGB(0,255,255), 7)
 
 main.MouseEnter:Connect(function()
     services.ContextActionService:BindActionAtPriority("disablemousescroll", function() 
@@ -2882,7 +2866,6 @@ end)
 local outline = utility.outline(main, "Accent")
 local border = utility.outline(outline, "Window Border")
 
--- Rainbow stroke around main frame
 spawn(function()
     while true do
         local t = tick()
